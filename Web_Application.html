@@ -1,0 +1,102 @@
+<html>
+    <head>
+        <title>My Movie Recommender</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    </head>
+    <body onload="api_call_and_table_update('#mytable')">
+        <div class="container">
+            <h2>Movie List</h2>   
+            <p></p>        
+            <table class="table table-striped" id="mytable" border="1">
+                <tbody>
+    
+                </tbody>
+            </table>
+            <p></p>
+            <button id="btn" onclick="post_data()"> 
+                click here 
+            </button> 
+        </div>      
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        
+        <script>
+        function api_call_and_table_update(selector)
+        { 
+            var settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "http://127.0.0.1:5000/data",
+                "method": "GET",
+                "headers": {
+                    "User-Agent": "PostmanRuntime/7.19.0",
+                    "Accept": "*/*",
+                    "Cache-Control": "no-cache",
+                    "Postman-Token": "9f981d87-3078-43af-ab64-0299a305abf5,a2ccf7f4-77bc-41db-94b8-aaa586cc90a4",
+                    "Host": "127.0.0.1:5000",
+                    "Accept-Encoding": "gzip, deflate",
+                    "Connection": "keep-alive",
+                    "cache-control": "no-cache"
+                }
+            }
+            // var jsons;
+            $.ajax(settings).done(function (response) {
+                // jsons = response;
+                console.log(response[0].Movie_Title);
+                x = Math.ceil(Object.keys(response).length/5)+5;
+                var val=0;
+                for (var i = 0; i < x; i++) { 
+                    var row = $('<tr/>');  
+                    for (var colIndex = 0; colIndex < 5; colIndex++) 
+                    { 
+                        row.append($("<td> <input type='checkbox' name='movielens' value='" +response[val].Movie_ID +"'>"+response[val].Movie_Title+" </td>"));
+                        val++;
+                    }
+                    $(selector).append(row);
+                }
+            });
+        }
+
+        function post_data()
+        {
+            $(document).ready(function() {
+                $("#btn").click(function(){
+                    var favorite = [];
+                    $.each($("input[name='movielens']:checked"), function(){
+                        favorite.push($(this).val());
+                    });
+                    //alert("My favourite sports are: " + favorite);
+                    var settings = {
+                    "async": true,
+                    "crossDomain": true,
+                    "url": "http://127.0.0.1:5000/pushdata",
+                    "method": "POST",
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "User-Agent": "PostmanRuntime/7.20.1",
+                        "Accept": "*/*",
+                        "Cache-Control": "no-cache",
+                        "Postman-Token": "818e5b07-c797-4187-959a-c7482e3df5f0,c43a2518-a1e0-485e-b4fd-338e07be645d",
+                        "Host": "127.0.0.1:5000",
+                        "Accept-Encoding": "gzip, deflate",
+                        "Content-Length": "46",
+                        "Connection": "keep-alive",
+                        "cache-control": "no-cache"
+                    },
+                    "processData": false,
+                    "data": "{\n\"movies_selected\" : ["+favorite+"] \n}"
+                    }
+                    alert(settings.data);
+                });
+            });
+            //alert("data");
+            $.ajax(settings).done(function (response) {
+            console.log(response);
+            });
+        }
+        </script>
+    
+    </body>
+</html>
